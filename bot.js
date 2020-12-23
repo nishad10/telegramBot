@@ -262,7 +262,7 @@ bot.onText(/\/price/, (msg) => {
               coingeckoData = ramda.find(
                 ramda.propEq(
                   "trade_url",
-                  "https://id.upbit.com/exchange?code=CRIX.UPBIT.BTC-VAL"
+                  "https://id.upbit.com/exchange?code=CRIX.UPBIT.BTC-RADS"
                 )
               )(coingecko.data.tickers);
             } catch (exception) {
