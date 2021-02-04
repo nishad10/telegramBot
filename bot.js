@@ -1,8 +1,8 @@
-const dotenv = require("dotenv");
-const TelegramBot = require("node-telegram-bot-api");
-const axios = require("axios");
-const ramda = require("ramda");
-const fs = require("fs");
+const dotenv = require('dotenv');
+const TelegramBot = require('node-telegram-bot-api');
+const axios = require('axios');
+const ramda = require('ramda');
+const fs = require('fs');
 
 let bot;
 const token = process.env.botToken;
@@ -14,7 +14,7 @@ function useNull() {
   return undefined;
 }
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV === 'production') {
   bot = new TelegramBot(token, { polling: true });
   //gubot.setWebHook(process.env.HEROKU_URL + token)
 } else {
@@ -22,12 +22,12 @@ if (process.env.NODE_ENV === "production") {
 }
 const config = {
   headers: {
-    ["X-CMC_PRO_API_KEY"]: process.env.coinMarketCapKey,
+    ['X-CMC_PRO_API_KEY']: process.env.coinMarketCapKey,
   },
 };
-console.log("Bot server started in the " + process.env.NODE_ENV + " mode");
+console.log('Bot server started in the ' + process.env.NODE_ENV + ' mode');
 
-bot.on("polling_error", (error) => {
+bot.on('polling_error', (error) => {
   console.log(error.code); // => 'EFATAL'
 });
 const priceTemplateBittrex = (name, data, btc) =>
@@ -54,8 +54,8 @@ const priceTemplateBittrex = (name, data, btc) =>
           )
       )
     ).toFixed(2) >= 0
-      ? " ⬆️"
-      : " ⬇️"
+      ? ' ⬆️'
+      : ' ⬇️'
   }`;
 
 const priceTemplateVCC = (name, data, btc) =>
@@ -69,7 +69,7 @@ const priceTemplateVCC = (name, data, btc) =>
     data.high24hr
   ).toFixed(8)}
 *24h change:* ${parseFloat(data.percentChange).toFixed(2)}% ${
-    parseFloat(data.percentChange).toFixed(2) >= 0 ? " ⬆️" : " ⬇️"
+    parseFloat(data.percentChange).toFixed(2) >= 0 ? ' ⬆️' : ' ⬇️'
   }`;
 
 const priceTemplateUpbit = (name, data, btc, coingeckoData) =>
@@ -99,7 +99,7 @@ const priceTemplateUpbit = (name, data, btc, coingeckoData) =>
     data.high_price
   ).toFixed(8)}
 *24h change:* ${parseFloat(data.signed_change_rate * 100).toFixed(2)}% ${
-    parseFloat(data.signed_change_rate * 100).toFixed(2) >= 0 ? " ⬆️" : " ⬇️"
+    parseFloat(data.signed_change_rate * 100).toFixed(2) >= 0 ? ' ⬆️' : ' ⬇️'
   }`;
 
 const priceTemplateFinexbox = (name, data, btc) =>
@@ -126,10 +126,10 @@ const priceTemplateLiveCoin = (name, data, btc) =>
   ).toFixed(8)}
 *24h change:* N/A`;
 
-bot.on("message", (msg) => {
-  if (!msg.text.startsWith("/")) {
-    const data = "NEWDATASTART\n" + msg.text + "\nNEWDATAEND\n";
-    fs.appendFile("spam.txt", data, (err) => {
+bot.on('message', (msg) => {
+  if (!msg.text.startsWith('/')) {
+    const data = 'NEWDATASTART\n' + msg.text + '\nNEWDATAEND\n';
+    fs.appendFile('spam.txt', data, (err) => {
       // In case of a error throw err.
       if (err) console.log(err);
     });
@@ -138,7 +138,7 @@ bot.on("message", (msg) => {
     `\x1b[36m Requested by: \x1b[0m${msg.from.id}, \x1b[36m Alias: \x1b[0m${
       msg.from.username
     } ${
-      msg.chat.type === "supergroup"
+      msg.chat.type === 'supergroup'
         ? `\x1b[36m Group: \x1b[0m${msg.chat.title}`
         : `\x1b[36m Private: \x1b[0m${msg.chat.username}`
     }
@@ -148,7 +148,7 @@ bot.on("message", (msg) => {
 });
 bot.onText(/\/ping/, (msg) => {
   if (new Date(new Date().toUTCString()) - new Date(msg.date * 1000) < 10000)
-    bot.sendMessage(msg.chat.id, "pong");
+    bot.sendMessage(msg.chat.id, 'pong');
 });
 bot.onText(/\/help/, (msg) => {
   if (new Date(new Date().toUTCString()) - new Date(msg.date * 1000) < 10000)
@@ -157,26 +157,26 @@ bot.onText(/\/help/, (msg) => {
       `
 /price - To see the VAL price across different exchanges
 /mcap  - To see the VAL market capitalization`,
-      { parse_mode: "Markdown" }
+      { parse_mode: 'Markdown' }
     );
 });
 bot.onText(/\/repo/, (msg) => {
   if (new Date(new Date().toUTCString()) - new Date(msg.date * 1000) < 10000)
     bot.sendMessage(
       msg.chat.id,
-      "[GitHub](https://github.com/nishad10/telegramBot)",
-      { parse_mode: "Markdown" }
+      '[GitHub](https://github.com/nishad10/telegramBot)',
+      { parse_mode: 'Markdown' }
     );
 });
 bot.onText(/\/mcap/, (msg, a) => {
   axios
     .all([
       httpClient.get(
-        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=VAL",
+        'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=VAL',
         config
       ),
       httpClient.get(
-        "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC",
+        'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC',
         config
       ),
     ])
@@ -190,7 +190,7 @@ bot.onText(/\/mcap/, (msg, a) => {
             mcap.data.data.VAL.quote.USD.market_cap /
               btc.data.data.BTC.quote.USD.price
           ).toFixed(2)} BTC`,
-          { parse_mode: "Markdown" }
+          { parse_mode: 'Markdown' }
         );
       })
     )
@@ -212,18 +212,18 @@ bot.onText(/\/price/, (msg) => {
       .all([
         httpClient
           .get(
-            "https://api.bittrex.com/api/v1.1/public/getmarketsummary?market=btc-val"
+            'https://api.bittrex.com/api/v1.1/public/getmarketsummary?market=btc-val'
           )
           .catch(useNull), //bittrex with param
         httpClient
           .get(
-            "https://api.bittrex.com/api/v1.1/public/getmarketsummary?market=USD-BTC"
+            'https://api.bittrex.com/api/v1.1/public/getmarketsummary?market=USD-BTC'
           )
           .catch(useNull),
         // httpClient.get(`https://vcc.exchange/api/v2/summary`).catch(useNull), // vcc without param
         httpClient
           .get(
-            "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC",
+            'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC',
             config
           )
           .catch(useNull), // This is the BTC USD Price for converting finexbox VAL/BTC price to USD. !!! Will have small discrepancy as not getting the BTC/USD price from finexbox directly'
@@ -237,13 +237,13 @@ bot.onText(/\/price/, (msg) => {
           .catch(useNull), // LivecoinBTC
           */
         httpClient
-          .get("https://api.upbit.com/v1/ticker?markets=BTC-VAL")
+          .get('https://api.upbit.com/v1/ticker?markets=BTC-VAL')
           .catch(useNull), //upbit with param
         httpClient
-          .get("https://api.upbit.com/v1/ticker?markets=USDT-BTC")
+          .get('https://api.upbit.com/v1/ticker?markets=USDT-BTC')
           .catch(useNull), //upbit with param
         httpClient
-          .get("https://api.coingecko.com/api/v3/coins/radium")
+          .get('https://api.coingecko.com/api/v3/coins/radium')
           .catch(useNull), //coingecko
       ])
       .then(
@@ -261,8 +261,8 @@ bot.onText(/\/price/, (msg) => {
             try {
               coingeckoData = ramda.find(
                 ramda.propEq(
-                  "trade_url",
-                  "https://id.upbit.com/exchange?code=CRIX.UPBIT.BTC-RADS"
+                  'trade_url',
+                  'https://id.upbit.com/exchange?code=CRIX.UPBIT.BTC-VAL'
                 )
               )(coingecko.data.tickers);
             } catch (exception) {
@@ -335,21 +335,21 @@ bot.onText(/\/price/, (msg) => {
               msg.chat.id,
               `${
                 !ramda.isNil(bittrex)
-                  ? priceTemplateBittrex("Bittrex", bittrexData, bittrexBTC)
-                  : "[BITTREX](https://bittrex.com/Market/Index?MarketName=BTC-VAL) servers are down."
+                  ? priceTemplateBittrex('Bittrex', bittrexData, bittrexBTC)
+                  : '[BITTREX](https://bittrex.com/Market/Index?MarketName=BTC-VAL) servers are down.'
               }
              \n${
                !ramda.isNil(upbit)
                  ? priceTemplateUpbit(
-                     "Upbit",
+                     'Upbit',
                      upbitData,
                      upbitBTC,
                      coingeckoData
                    )
-                 : "[UPbit](https://upbit.com/exchange?code=CRIX.UPBIT.BTC-VAL) Servers are down."
+                 : '[UPbit](https://upbit.com/exchange?code=CRIX.UPBIT.BTC-VAL) Servers are down.'
              }
               `,
-              { parse_mode: "Markdown", disable_web_page_preview: true }
+              { parse_mode: 'Markdown', disable_web_page_preview: true }
             );
           }
         )
@@ -359,7 +359,7 @@ bot.onText(/\/price/, (msg) => {
         bot.sendMessage(
           save.chat.id,
           `Looks like something went wrong, try again after some time, this should not happen.`,
-          { parse_mode: "Markdown", disable_web_page_preview: true }
+          { parse_mode: 'Markdown', disable_web_page_preview: true }
         );
       });
 });
